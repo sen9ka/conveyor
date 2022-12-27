@@ -1,24 +1,35 @@
 package ru.senya.conveyor.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.senya.conveyor.dto.*;
 import ru.senya.conveyor.entity.enums.EmploymentStatus;
+import ru.senya.conveyor.entity.enums.Gender;
 import ru.senya.conveyor.entity.enums.MaritalStatus;
 import ru.senya.conveyor.entity.enums.Position;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 @Service
 public class ConveyorService {
 
-    private final BigDecimal baseLoanRate = new BigDecimal("10");
-    private final BigDecimal insuranceBonus = new BigDecimal("0.3");
-    private final BigDecimal salaryClientBonus = new BigDecimal("0.1");
+    @Value("${baseLoanRate}")
+    private BigDecimal baseLoanRate;
 
-    //////////////////////conveyor/offers////////////////////////////////////
+    @Value("${insuranceBonus}")
+    private BigDecimal insuranceBonus;
+
+    @Value("${salaryClientBonus}")
+    private BigDecimal salaryClientBonus;
+
+    /*
+    conveyor/offers
+     */
 
     public List<LoanOfferDTO> offerDTOList (LoanApplicationRequestDTO loanApplicationRequestDTO) {
 
@@ -45,6 +56,7 @@ public class ConveyorService {
         return offerDTOList.stream().sorted(Comparator.comparingDouble(loanOfferDto -> loanOfferDto.getRate().doubleValue())).toList();
     }
 
+    // Установить есть ли страховка и является ли клиентом банка
     private void setInsuranceAndSalary(List<LoanOfferDTO> offerDTOList) {
         offerDTOList.get(0).setIsInsuranceEnabled(false);
         offerDTOList.get(0).setIsSalaryClient(false);
@@ -59,6 +71,7 @@ public class ConveyorService {
         offerDTOList.get(3).setIsSalaryClient(true);
     }
 
+    // Рассчитать ставку
     private void calculateOffersRate(LoanOfferDTO loanOfferDTO) {
         if (!loanOfferDTO.getIsInsuranceEnabled() && !loanOfferDTO.getIsSalaryClient()) {
             loanOfferDTO.setRate(baseLoanRate);
@@ -69,27 +82,34 @@ public class ConveyorService {
         } else loanOfferDTO.setRate(baseLoanRate.subtract(salaryClientBonus).subtract(insuranceBonus));
     }
 
+    // Рассчитать финальную сумму
     private void calculateTotalAmount(LoanOfferDTO loanOfferDTO) {
         if (!loanOfferDTO.getIsInsuranceEnabled()) {
             BigDecimal baseAmount;
             baseAmount = loanOfferDTO.getRequestedAmount()
-                    .add(loanOfferDTO.getRequestedAmount().divide(BigDecimal.valueOf(100),RoundingMode.HALF_UP).multiply(loanOfferDTO.getRate()));
+                    .add(loanOfferDTO.getRequestedAmount().divide(BigDecimal.valueOf(100),RoundingMode.HALF_UP)
+                            .multiply(loanOfferDTO.getRate()));
             loanOfferDTO.setTotalAmount(baseAmount);
         } else {
             BigDecimal baseAmount;
             baseAmount = loanOfferDTO.getRequestedAmount()
-                    .add(loanOfferDTO.getRequestedAmount().divide(BigDecimal.valueOf(100),RoundingMode.HALF_UP).multiply(loanOfferDTO.getRate()))
+                    .add(loanOfferDTO.getRequestedAmount().divide(BigDecimal.valueOf(100),RoundingMode.HALF_UP)
+                            .multiply(loanOfferDTO.getRate()))
                     .add(loanOfferDTO.getRequestedAmount().multiply(BigDecimal.valueOf(0.1)));
             loanOfferDTO.setTotalAmount(baseAmount);
         }
     }
 
+    // Рассчитать месячный платеж
     private void calculateOfferMonthlyPayment(LoanOfferDTO loanOfferDTO) {
         loanOfferDTO.setMonthlyPayment(loanOfferDTO.getTotalAmount().divide(BigDecimal.valueOf(loanOfferDTO.getTerm()),RoundingMode.HALF_UP));
     }
 
 
-    //////////////////////conveyor/calculation///////////////////////////
+    /*
+    conveyor/calculation
+    */
+
 
     public CreditDTO creditDTO(ScoringDataDTO scoringDataDTO) {
 
@@ -101,12 +121,12 @@ public class ConveyorService {
         creditDTO.setAmount(scoringDataDTO.getAmount());
         creditDTO.setPsk(calculatePsk(creditDTO));
         creditDTO.setMonthlyPayment(calculateMonthlyPayment(creditDTO));
-
         creditDTO.setPaymentSchedule(paymentScheduleElements(creditDTO));
 
         return creditDTO;
     }
 
+    // Скоринг ставки
     private BigDecimal calculateCreditRate(ScoringDataDTO scoringDataDTO) {
 
         BigDecimal loanRate = new BigDecimal(String.valueOf(baseLoanRate));
@@ -145,19 +165,19 @@ public class ConveyorService {
             loanRate = loanRate.add(BigDecimal.valueOf(0.1));
         }
 
-//        LocalDate currentDate = LocalDate.now();
-//        LocalDate birthday = scoringDataDTO.getBirthDate();
-//        Period age = Period.between(birthday, currentDate);
-//        if (age.getYears() < 20 | age.getYears() > 60) {
-//            loanRate = BigDecimal.valueOf(-1);
-//            return loanRate;
-//        }
-//
-//        if (scoringDataDTO.getGender().equals(Gender.FEMALE) && age.getYears() > 35 && age.getYears() < 60) {
-//            loanRate = loanRate.subtract(BigDecimal.valueOf(0.3));
-//        } else if (scoringDataDTO.getGender().equals(Gender.MALE) && age.getYears() > 30 && age.getYears() < 55) {
-//            loanRate = loanRate.subtract(BigDecimal.valueOf(0.3));
-//        }
+        LocalDate currentDate = LocalDate.now();
+        LocalDate birthday = scoringDataDTO.getBirthdate();
+        Period age = Period.between(birthday, currentDate);
+        if (age.getYears() < 20 || age.getYears() > 60) {
+            loanRate = BigDecimal.valueOf(-1);
+            return loanRate;
+        }
+
+        if (scoringDataDTO.getGender().equals(Gender.FEMALE) && age.getYears() > 35 && age.getYears() < 60) {
+            loanRate = loanRate.subtract(BigDecimal.valueOf(0.3));
+        } else if (scoringDataDTO.getGender().equals(Gender.MALE) && age.getYears() > 30 && age.getYears() < 55) {
+            loanRate = loanRate.subtract(BigDecimal.valueOf(0.3));
+        }
 
         if (scoringDataDTO.getEmployment().getWorkExperienceTotal() < 12) {
             loanRate = BigDecimal.valueOf(-1);
@@ -170,6 +190,7 @@ public class ConveyorService {
         return loanRate;
     }
 
+    // Полная стоимость кредита
     private BigDecimal calculatePsk(CreditDTO creditDTO) {
         BigDecimal totalAmount = new BigDecimal(String.valueOf(creditDTO.getAmount()));
 
@@ -182,6 +203,7 @@ public class ConveyorService {
         return totalAmount.add(deptAmount);
     }
 
+    // Месячный платеж
     private BigDecimal calculateMonthlyPayment(CreditDTO creditDTO) {
         return creditDTO.getPsk().divide(BigDecimal.valueOf(creditDTO.getTerm()), RoundingMode.HALF_UP);
     }
