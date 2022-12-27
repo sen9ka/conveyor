@@ -5,6 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import jdk.jfr.BooleanFlag;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -49,7 +50,7 @@ public class ScoringDataDTO {
 
     @DateTimeFormat(pattern="yyyy-mm-dd")
     @Schema(description = "Дата рождения")
-    private LocalDate birthDate;
+    private LocalDate birthdate;
 
     @NumberFormat
     @Size(min = 4, max = 4)
@@ -73,11 +74,18 @@ public class ScoringDataDTO {
     @Schema(description = "Статус отношений: MARRIED | SINGLE | DIVORCED")
     private MaritalStatus maritalStatus;
 
+    @NumberFormat
+    @DecimalMin("10000")
     private Integer dependentAmount;
 
+    @NotEmpty
+    @Schema(description = "Информация о работе")
     private EmploymentDTO employment;
 
+    @NotEmpty
+    @Schema(description = "Информация о работе")
     private String account;
+
 
     private Boolean isInsuranceEnabled;
 
