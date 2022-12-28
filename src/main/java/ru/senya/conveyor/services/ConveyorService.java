@@ -1,6 +1,5 @@
 package ru.senya.conveyor.services;
 
-import lombok.Builder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.senya.conveyor.entity.dto.*;
