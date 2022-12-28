@@ -1,13 +1,15 @@
-package ru.senya.conveyor.dto;
+package ru.senya.conveyor.entity.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CreditDTO {
 
     private BigDecimal amount;
