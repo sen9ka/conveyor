@@ -1,17 +1,15 @@
-package ru.senya.conveyor.dto;
+package ru.senya.conveyor.entity.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import jdk.jfr.BooleanFlag;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
-import org.springframework.validation.annotation.Validated;
 import ru.senya.conveyor.entity.enums.Gender;
 import ru.senya.conveyor.entity.enums.MaritalStatus;
 

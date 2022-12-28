@@ -1,13 +1,14 @@
-package ru.senya.conveyor.dto;
+package ru.senya.conveyor.entity.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Getter @Setter @NoArgsConstructor
+@Getter @Setter
+@Builder
 public class PaymentScheduleElement {
 
     private Integer number;
