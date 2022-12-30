@@ -1,4 +1,4 @@
-package ru.senya.conveyor.dto;
+package ru.senya.conveyor.entity.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
-import org.springframework.validation.annotation.Validated;
 import ru.senya.conveyor.entity.enums.Gender;
 import ru.senya.conveyor.entity.enums.MaritalStatus;
 
@@ -49,7 +48,7 @@ public class ScoringDataDTO {
 
     @DateTimeFormat(pattern="yyyy-mm-dd")
     @Schema(description = "Дата рождения")
-    private LocalDate birthDate;
+    private LocalDate birthdate;
 
     @NumberFormat
     @Size(min = 4, max = 4)
@@ -73,11 +72,18 @@ public class ScoringDataDTO {
     @Schema(description = "Статус отношений: MARRIED | SINGLE | DIVORCED")
     private MaritalStatus maritalStatus;
 
+    @NumberFormat
+    @DecimalMin("10000")
     private Integer dependentAmount;
 
+    @NotEmpty
+    @Schema(description = "Информация о работе")
     private EmploymentDTO employment;
 
+    @NotEmpty
+    @Schema(description = "Информация о работе")
     private String account;
+
 
     private Boolean isInsuranceEnabled;
 

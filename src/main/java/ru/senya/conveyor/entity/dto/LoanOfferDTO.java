@@ -1,12 +1,12 @@
-package ru.senya.conveyor.dto;
+package ru.senya.conveyor.entity.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
-@Getter @Setter @NoArgsConstructor
+@Getter @Setter
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class LoanOfferDTO {
 
     private Long applicationId;

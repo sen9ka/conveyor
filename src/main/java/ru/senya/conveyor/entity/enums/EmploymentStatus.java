@@ -4,5 +4,4 @@ public enum EmploymentStatus {
     SELFEMPLOYED,
     UNEMPLOYED,
     BUSINESSOWNER
-
 }
