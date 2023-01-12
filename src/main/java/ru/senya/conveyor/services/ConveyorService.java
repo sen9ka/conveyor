@@ -1,12 +1,15 @@
 package ru.senya.conveyor.services;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.senya.conveyor.entity.dto.*;
 import ru.senya.conveyor.entity.enums.EmploymentStatus;
 import ru.senya.conveyor.entity.enums.Gender;
 import ru.senya.conveyor.entity.enums.MaritalStatus;
-import ru.senya.conveyor.entity.enums.Position;
+import ru.senya.conveyor.entity.enums.EmploymentPosition;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@Service
+@Service @RequiredArgsConstructor
 public class ConveyorService {
 
     public static final int AGE_20 = 20;
@@ -36,14 +39,20 @@ public class ConveyorService {
     public static final double MIDDLEAGE_FEMALE_BONUS = 0.3;
     public static final double MIDDLEAGE_MALE_BONUS = 0.3;
 
-    @Value("${baseLoanRate}")
-    private BigDecimal baseLoanRate;
-
-    @Value("${insuranceBonus}")
-    private BigDecimal insuranceBonus;
-
-    @Value("${salaryClientBonus}")
-    private BigDecimal salaryClientBonus;
+//    @Value("${baseLoanRate}")
+//    private BigDecimal baseLoanRate;
+////
+    BigDecimal baseLoanRate = new BigDecimal("10");
+////
+//    @Value("${insuranceBonus}")
+//    private BigDecimal insuranceBonus;
+////
+    BigDecimal insuranceBonus = new BigDecimal("0.3");
+//
+//    @Value("${salaryClientBonus}")
+//    private BigDecimal salaryClientBonus;
+////
+    BigDecimal salaryClientBonus = new BigDecimal("0.1");
 
     /*
     conveyor/offers
@@ -78,7 +87,7 @@ public class ConveyorService {
         offerDTOList.add(thirdOffer);
         offerDTOList.add(fourthOffer);
 
-        offerDTOList.forEach(loanOfferDTO -> loanOfferDTO.setApplicationId(1L));
+//        offerDTOList.forEach(loanOfferDTO -> loanOfferDTO.setApplicationId(1L));
         offerDTOList.forEach(loanOfferDTO -> loanOfferDTO.setRequestedAmount(loanApplicationRequestDTO.getAmount()));
         offerDTOList.forEach(loanOfferDTO -> loanOfferDTO.setTerm(loanApplicationRequestDTO.getTerm()));
         offerDTOList.forEach(loanOfferDTO -> loanOfferDTO.setRate(calculateOffersRate(loanOfferDTO)));
@@ -89,7 +98,7 @@ public class ConveyorService {
     }
 
     // Рассчитать ставку
-    private BigDecimal calculateOffersRate(LoanOfferDTO loanOfferDTO) {
+    public BigDecimal calculateOffersRate(LoanOfferDTO loanOfferDTO) {
 
         BigDecimal offerRate = new BigDecimal(String.valueOf(baseLoanRate));
 
@@ -159,18 +168,18 @@ public class ConveyorService {
             loanRate = loanRate.subtract(salaryClientBonus);
         }
 
-        if (scoringDataDTO.getEmployment().getEmploymentStatus().equals(EmploymentStatus.UNEMPLOYED)) {
+        if (scoringDataDTO.getEmployment().getStatus().equals(EmploymentStatus.UNEMPLOYED)) {
             loanRate = BigDecimal.valueOf(CREDIT_REJECTION_VALUE);
             return loanRate;
-        } else if (scoringDataDTO.getEmployment().getEmploymentStatus().equals(EmploymentStatus.SELFEMPLOYED)) {
+        } else if (scoringDataDTO.getEmployment().getStatus().equals(EmploymentStatus.SELF_EMPLOYED)) {
             loanRate = loanRate.add(BigDecimal.valueOf(SELFEMPLOYMENT_BONUS));
-        } else if (scoringDataDTO.getEmployment().getEmploymentStatus().equals(EmploymentStatus.BUSINESSOWNER)) {
+        } else if (scoringDataDTO.getEmployment().getStatus().equals(EmploymentStatus.BUSINESS_OWNER)) {
             loanRate = loanRate.add(BigDecimal.valueOf(BUSINESSOWNER_BONUS));
         }
 
-        if (scoringDataDTO.getEmployment().getPosition().equals(Position.MIDDLEMAANAGER)) {
+        if (scoringDataDTO.getEmployment().getPosition().equals(EmploymentPosition.MID_MANAGER)) {
             loanRate = loanRate.subtract(BigDecimal.valueOf(MIDDLEMANAGER_BONUS));
-        } else if (scoringDataDTO.getEmployment().getPosition().equals(Position.TOPMANAGER)) {
+        } else if (scoringDataDTO.getEmployment().getPosition().equals(EmploymentPosition.TOP_MANAGER)) {
             loanRate = loanRate.subtract(BigDecimal.valueOf(TOPMANAGER_BONUS));
         }
 
@@ -228,7 +237,7 @@ public class ConveyorService {
         return calculatePsk(scoringDataDTO).divide(BigDecimal.valueOf(scoringDataDTO.getTerm()), RoundingMode.HALF_UP);
     }
 
-    public List<PaymentScheduleElement> paymentScheduleElements(ScoringDataDTO scoringDataDTO) {
+    private List<PaymentScheduleElement> paymentScheduleElements(ScoringDataDTO scoringDataDTO) {
 
         List<PaymentScheduleElement> paymentScheduleElements = new ArrayList<>();
         BigDecimal remainingDebt = new BigDecimal(String.valueOf(calculatePsk(scoringDataDTO)));

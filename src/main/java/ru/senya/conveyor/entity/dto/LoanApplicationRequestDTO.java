@@ -2,9 +2,7 @@ package ru.senya.conveyor.entity.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 
@@ -12,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter @Setter @NoArgsConstructor
+@Builder @AllArgsConstructor
 public class LoanApplicationRequestDTO {
 
     @NumberFormat

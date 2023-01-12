@@ -17,6 +17,7 @@ import ru.senya.conveyor.entity.dto.ScoringDataDTO;
 import ru.senya.conveyor.services.ConveyorService;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor

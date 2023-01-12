@@ -5,9 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 import ru.senya.conveyor.entity.enums.Gender;
@@ -17,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter @Setter @NoArgsConstructor
+@Builder @AllArgsConstructor
 public class ScoringDataDTO {
 
     @NumberFormat
@@ -74,7 +73,7 @@ public class ScoringDataDTO {
 
     @NumberFormat
     @DecimalMin("10000")
-    private Integer dependentAmount;
+    private BigDecimal dependentAmount;
 
     @NotEmpty
     @Schema(description = "Информация о работе")
