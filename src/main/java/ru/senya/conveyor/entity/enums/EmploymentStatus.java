@@ -1,7 +1,8 @@
 package ru.senya.conveyor.entity.enums;
 
 public enum EmploymentStatus {
-    SELFEMPLOYED,
     UNEMPLOYED,
-    BUSINESSOWNER
+    SELF_EMPLOYED,
+    EMPLOYED,
+    BUSINESS_OWNER
 }

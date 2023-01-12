@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Getter @Setter
 @Builder
@@ -23,4 +24,15 @@ public class PaymentScheduleElement {
 
     private BigDecimal remainingDebt;
 
+    @Override
+    public String toString() {
+        return "PaymentScheduleElement{" +
+                "number=" + number +
+                ", date=" + date +
+                ", totalPayment=" + totalPayment +
+                ", interestPayment=" + interestPayment +
+                ", debtPayment=" + debtPayment +
+                ", remainingDebt=" + remainingDebt +
+                '}';
+    }
 }
