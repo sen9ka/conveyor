@@ -1,21 +1,16 @@
 package ru.senya.conveyor.services;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.senya.conveyor.entity.dto.*;
 import ru.senya.conveyor.entity.enums.EmploymentPosition;
 import ru.senya.conveyor.entity.enums.EmploymentStatus;
 import ru.senya.conveyor.entity.enums.Gender;
 import ru.senya.conveyor.entity.enums.MaritalStatus;
-
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConveyorServiceTest {
@@ -70,7 +65,6 @@ class ConveyorServiceTest {
                 .maritalStatus(MaritalStatus.MARRIED)
                 .dependentAmount(BigDecimal.valueOf(12))
                 .employment(EmploymentDTO.builder()
-                        .employmentId(31)
                         .status(EmploymentStatus.SELF_EMPLOYED)
                         .employerINN(String.valueOf(15116161))
                         .salary(BigDecimal.valueOf(400000))
@@ -85,7 +79,7 @@ class ConveyorServiceTest {
 
         PaymentScheduleElement firstElement = PaymentScheduleElement.builder()
                 .number(1)
-                .date(LocalDate.of(2023, 2, 12))
+                .date(LocalDate.now().plusMonths(1))
                 .totalPayment(BigDecimal.valueOf(5995.00).setScale(2))
                 .interestPayment(BigDecimal.valueOf(5395.5).setScale(4))
                 .debtPayment(BigDecimal.valueOf(599.5).setScale(4))
@@ -94,7 +88,7 @@ class ConveyorServiceTest {
 
         PaymentScheduleElement secondElement = PaymentScheduleElement.builder()
                 .number(2)
-                .date(LocalDate.of(2023, 3, 12))
+                .date(LocalDate.now().plusMonths(2))
                 .totalPayment(BigDecimal.valueOf(5995.00).setScale(2))
                 .interestPayment(BigDecimal.valueOf(5395.5).setScale(4))
                 .debtPayment(BigDecimal.valueOf(599.5).setScale(4))
@@ -106,7 +100,7 @@ class ConveyorServiceTest {
         paymentScheduleElements.add(firstElement);
         paymentScheduleElements.add(secondElement);
 
-        CreditDTO testCreditDTO = CreditDTO.builder()
+        CreditDTO expectedCreditDTO = CreditDTO.builder()
                 .amount(BigDecimal.valueOf(10000).setScale(0))
                 .term(2)
                 .monthlyPayment(BigDecimal.valueOf(5995.00).setScale(2))
@@ -118,8 +112,8 @@ class ConveyorServiceTest {
                 .build();
 
         ConveyorService conveyorService = new ConveyorService();
-        CreditDTO creditDTO = conveyorService.getCreditDTO(testScoringDataDTO);
-        assertEquals(testCreditDTO.toString(), creditDTO.toString());
+        CreditDTO actualCreditDTO = conveyorService.getCreditDTO(testScoringDataDTO);
+        assertEquals(expectedCreditDTO.toString(), actualCreditDTO.toString());
     }
 
 }

@@ -39,20 +39,20 @@ public class ConveyorService {
     public static final double MIDDLEAGE_FEMALE_BONUS = 0.3;
     public static final double MIDDLEAGE_MALE_BONUS = 0.3;
 
-    @Value("${baseLoanRate}")
-    private BigDecimal baseLoanRate;
+//    @Value("${baseLoanRate}")
+//    private BigDecimal baseLoanRate;
 
-//    BigDecimal baseLoanRate = new BigDecimal("10");
+    BigDecimal baseLoanRate = new BigDecimal("10");
 
-    @Value("${insuranceBonus}")
-    private BigDecimal insuranceBonus;
+//    @Value("${insuranceBonus}")
+//    private BigDecimal insuranceBonus;
 
-//    BigDecimal insuranceBonus = new BigDecimal("0.3");
+    BigDecimal insuranceBonus = new BigDecimal("0.3");
 
-    @Value("${salaryClientBonus}")
-    private BigDecimal salaryClientBonus;
+//    @Value("${salaryClientBonus}")
+//    private BigDecimal salaryClientBonus;
 
-//    BigDecimal salaryClientBonus = new BigDecimal("0.1");
+    BigDecimal salaryClientBonus = new BigDecimal("0.1");
 
     /*
     conveyor/offers
@@ -98,7 +98,7 @@ public class ConveyorService {
     }
 
     // Рассчитать ставку
-    public BigDecimal calculateOffersRate(LoanOfferDTO loanOfferDTO) {
+    private BigDecimal calculateOffersRate(LoanOfferDTO loanOfferDTO) {
 
         BigDecimal offerRate = new BigDecimal(String.valueOf(baseLoanRate));
 
