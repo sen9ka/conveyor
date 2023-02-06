@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Builder @AllArgsConstructor
 public class EmploymentDTO {
 
-    private Integer employmentId;
+//    private Integer employmentId;
 
     @NotEmpty
     @Schema(description = "Рабочий статус: SELFEMPLOYED | UNEMPLOYED | BUSINESSOWNER")
