@@ -3,7 +3,6 @@ package ru.senya.conveyor.services;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.senya.conveyor.entity.dto.*;
 import ru.senya.conveyor.entity.enums.EmploymentStatus;
@@ -12,6 +11,7 @@ import ru.senya.conveyor.entity.enums.MaritalStatus;
 import ru.senya.conveyor.entity.enums.EmploymentPosition;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@Service @RequiredArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class ConveyorService {
 
     public static final int AGE_20 = 20;
@@ -39,20 +40,20 @@ public class ConveyorService {
     public static final double MIDDLEAGE_FEMALE_BONUS = 0.3;
     public static final double MIDDLEAGE_MALE_BONUS = 0.3;
 
-    @Value("${baseLoanRate}")
-    private BigDecimal baseLoanRate;
+//    @Value("${baseLoanRate}")
+//    private BigDecimal baseLoanRate;
 
-//    BigDecimal baseLoanRate = new BigDecimal("10");
+    BigDecimal baseLoanRate = new BigDecimal("10");
 
-    @Value("${insuranceBonus}")
-    private BigDecimal insuranceBonus;
+//    @Value("${insuranceBonus}")
+//    private BigDecimal insuranceBonus;
 
-//    BigDecimal insuranceBonus = new BigDecimal("0.3");
+    BigDecimal insuranceBonus = new BigDecimal("0.3");
 
-    @Value("${salaryClientBonus}")
-    private BigDecimal salaryClientBonus;
+//    @Value("${salaryClientBonus}")
+//    private BigDecimal salaryClientBonus;
 
-//    BigDecimal salaryClientBonus = new BigDecimal("0.1");
+    BigDecimal salaryClientBonus = new BigDecimal("0.1");
 
     /*
     conveyor/offers
@@ -98,7 +99,7 @@ public class ConveyorService {
     }
 
     // Рассчитать ставку
-    public BigDecimal calculateOffersRate(LoanOfferDTO loanOfferDTO) {
+    private BigDecimal calculateOffersRate(LoanOfferDTO loanOfferDTO) {
 
         BigDecimal offerRate = new BigDecimal(String.valueOf(baseLoanRate));
 
@@ -148,7 +149,7 @@ public class ConveyorService {
                 .isInsuranceEnabled(scoringDataDTO.getIsInsuranceEnabled())
                 .isSalaryClient(scoringDataDTO.getIsSalaryClient())
                 .amount(scoringDataDTO.getAmount())
-                .psk(calculatePsk(scoringDataDTO))
+                .psk(calculatePskPercentage(scoringDataDTO))
                 .monthlyPayment(calculateMonthlyPayment(scoringDataDTO))
                 .paymentSchedule(paymentScheduleElements(scoringDataDTO))
                 .build();
@@ -235,6 +236,18 @@ public class ConveyorService {
     // Месячный платеж
     private BigDecimal calculateMonthlyPayment(ScoringDataDTO scoringDataDTO) {
         return calculatePsk(scoringDataDTO).divide(BigDecimal.valueOf(scoringDataDTO.getTerm()), RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal calculatePskPercentage(ScoringDataDTO scoringDataDTO) {
+        MathContext mc = new MathContext(10000, RoundingMode.HALF_DOWN);
+
+        BigDecimal pskPercentage = new BigDecimal(String.valueOf(calculatePsk(scoringDataDTO)));
+        pskPercentage = pskPercentage.divide(scoringDataDTO.getAmount(), mc);
+        pskPercentage = pskPercentage.subtract(BigDecimal.valueOf(1));
+        pskPercentage = pskPercentage.divide(BigDecimal.valueOf(scoringDataDTO.getTerm()).divide(BigDecimal.valueOf(12), mc), mc);
+        pskPercentage = pskPercentage.multiply(BigDecimal.valueOf(100));
+
+        return pskPercentage.setScale(2, RoundingMode.HALF_UP);
     }
 
     private List<PaymentScheduleElement> paymentScheduleElements(ScoringDataDTO scoringDataDTO) {
