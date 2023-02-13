@@ -10,7 +10,6 @@
 	</parent>
 	<groupId>ru.senya</groupId>
 	<artifactId>conveyor</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>conveyor</name>
 	<description>conveyor project for neostudy</description>
 	<properties>

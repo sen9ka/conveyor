@@ -112,7 +112,7 @@ public class TestData {
                 .term(2)
                 .monthlyPayment(BigDecimal.valueOf(5995.00).setScale(2))
                 .rate(BigDecimal.valueOf(9.0))
-                .psk(BigDecimal.valueOf(11990.00).setScale(2))
+                .psk(BigDecimal.valueOf(119.40).setScale(2))
                 .isInsuranceEnabled(true)
                 .isSalaryClient(true)
                 .paymentSchedule(paymentScheduleElements)
