@@ -1,4 +1,4 @@
-package ru.senya.conveyor.services;
+package ru.senya.conveyor.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

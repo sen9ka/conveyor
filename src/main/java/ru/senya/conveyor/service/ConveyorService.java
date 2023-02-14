@@ -1,7 +1,5 @@
-package ru.senya.conveyor.services;
+package ru.senya.conveyor.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.senya.conveyor.entity.dto.*;
@@ -19,39 +17,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static ru.senya.conveyor.service.Constant.*;
+
 @Service
 @RequiredArgsConstructor
 public class ConveyorService {
 
-    public static final int AGE_20 = 20;
-    public static final int AGE_60 = 60;
-    public static final int AGE_35 = 35;
-    public static final int AGE_30 = 30;
-    public static final int AGE_55 = 55;
-    public static final int CREDIT_REJECTION_VALUE = -1;
-    public static final double SELFEMPLOYMENT_BONUS = 0.1;
-    public static final double BUSINESSOWNER_BONUS = 0.3;
-    public static final double MIDDLEMANAGER_BONUS = 0.2;
-    public static final double TOPMANAGER_BONUS = 0.4;
-    public static final double MARRIED_BONUS = 0.3;
-    public static final double DIVORCED_FINE = 0.1;
-    public static final int MIN_WORKEXPERIENCE_TOTAL = 12;
-    public static final int MIN_WORKEXPERIENCE_CURRENT = 3;
-    public static final double MIDDLEAGE_FEMALE_BONUS = 0.3;
-    public static final double MIDDLEAGE_MALE_BONUS = 0.3;
-
-//    @Value("${baseLoanRate}")
-//    private BigDecimal baseLoanRate;
-
     BigDecimal baseLoanRate = new BigDecimal("10");
 
-//    @Value("${insuranceBonus}")
-//    private BigDecimal insuranceBonus;
-
     BigDecimal insuranceBonus = new BigDecimal("0.3");
-
-//    @Value("${salaryClientBonus}")
-//    private BigDecimal salaryClientBonus;
 
     BigDecimal salaryClientBonus = new BigDecimal("0.1");
 
@@ -88,7 +62,7 @@ public class ConveyorService {
         offerDTOList.add(thirdOffer);
         offerDTOList.add(fourthOffer);
 
-//        offerDTOList.forEach(loanOfferDTO -> loanOfferDTO.setApplicationId(1L));
+
         offerDTOList.forEach(loanOfferDTO -> loanOfferDTO.setRequestedAmount(loanApplicationRequestDTO.getAmount()));
         offerDTOList.forEach(loanOfferDTO -> loanOfferDTO.setTerm(loanApplicationRequestDTO.getTerm()));
         offerDTOList.forEach(loanOfferDTO -> loanOfferDTO.setRate(calculateOffersRate(loanOfferDTO)));
@@ -103,11 +77,11 @@ public class ConveyorService {
 
         BigDecimal offerRate = new BigDecimal(String.valueOf(baseLoanRate));
 
-        if (!loanOfferDTO.getIsInsuranceEnabled() && !loanOfferDTO.getIsSalaryClient()) {
+        if (Boolean.TRUE.equals(!loanOfferDTO.getIsInsuranceEnabled()) && Boolean.TRUE.equals(!loanOfferDTO.getIsSalaryClient())) {
             return offerRate;
-        } else if (!loanOfferDTO.getIsInsuranceEnabled() && loanOfferDTO.getIsSalaryClient()) {
+        } else if (Boolean.TRUE.equals(!loanOfferDTO.getIsInsuranceEnabled()) && Boolean.TRUE.equals(loanOfferDTO.getIsSalaryClient())) {
             return offerRate.subtract(salaryClientBonus);
-        } else if (loanOfferDTO.getIsInsuranceEnabled() && !loanOfferDTO.getIsSalaryClient()){
+        } else if (Boolean.TRUE.equals(loanOfferDTO.getIsInsuranceEnabled()) && Boolean.TRUE.equals(!loanOfferDTO.getIsSalaryClient())){
             return offerRate.subtract(insuranceBonus);
         } else return offerRate.subtract(salaryClientBonus).subtract(insuranceBonus);
 
@@ -116,7 +90,7 @@ public class ConveyorService {
     // Рассчитать финальную сумму
     private BigDecimal calculateTotalAmount(LoanOfferDTO loanOfferDTO, LoanApplicationRequestDTO loanApplicationRequestDTO) {
         BigDecimal baseAmount;
-        if (!loanOfferDTO.getIsInsuranceEnabled()) {
+        if (Boolean.FALSE.equals(loanOfferDTO.getIsInsuranceEnabled())) {
             baseAmount = loanApplicationRequestDTO.getAmount()
                     .add(loanApplicationRequestDTO.getAmount().divide(BigDecimal.valueOf(100),RoundingMode.HALF_UP)
                             .multiply(calculateOffersRate(loanOfferDTO)));
@@ -161,11 +135,11 @@ public class ConveyorService {
 
         BigDecimal loanRate = new BigDecimal(String.valueOf(baseLoanRate));
 
-        if (scoringDataDTO.getIsInsuranceEnabled() && scoringDataDTO.getIsInsuranceEnabled()) {
+        if (scoringDataDTO.getIsInsuranceEnabled() && scoringDataDTO.getIsSalaryClient()) {
             loanRate = loanRate.subtract(insuranceBonus).subtract(salaryClientBonus);
-        } else if (scoringDataDTO.getIsInsuranceEnabled() && !scoringDataDTO.getIsSalaryClient()) {
+        } else if (Boolean.TRUE.equals(scoringDataDTO.getIsInsuranceEnabled()) && Boolean.TRUE.equals(!scoringDataDTO.getIsSalaryClient())) {
             loanRate = loanRate.subtract(insuranceBonus);
-        } else if (!scoringDataDTO.getIsInsuranceEnabled() && scoringDataDTO.getIsSalaryClient()) {
+        } else if (Boolean.TRUE.equals(!scoringDataDTO.getIsInsuranceEnabled()) && Boolean.TRUE.equals(scoringDataDTO.getIsSalaryClient())) {
             loanRate = loanRate.subtract(salaryClientBonus);
         }
 
@@ -198,7 +172,7 @@ public class ConveyorService {
         LocalDate currentDate = LocalDate.now();
         LocalDate birthday = scoringDataDTO.getBirthdate();
         Period age = Period.between(birthday, currentDate);
-        if (age.getYears() < AGE_20 || age.getYears() > AGE_60) {
+        if (age.getYears() < Constant.AGE_20 || age.getYears() > AGE_60) {
             loanRate = BigDecimal.valueOf(CREDIT_REJECTION_VALUE);
             return loanRate;
         }
@@ -220,11 +194,11 @@ public class ConveyorService {
         return loanRate;
     }
 
-    // Полная стоимость кредита
+    // Полная стоимость кредита (Формула расчета (упрощенная) - https://mokka.ru/blog/chto-takoe-polnaya-stoimost-kredita/)
     private BigDecimal calculatePsk(ScoringDataDTO scoringDataDTO) {
         BigDecimal totalAmount = new BigDecimal(String.valueOf(scoringDataDTO.getAmount()));
 
-        if (scoringDataDTO.getIsInsuranceEnabled()) {
+        if (Boolean.TRUE.equals(scoringDataDTO.getIsInsuranceEnabled())) {
             totalAmount = totalAmount.add(scoringDataDTO.getAmount().multiply(BigDecimal.valueOf(0.1)));
         }
 
