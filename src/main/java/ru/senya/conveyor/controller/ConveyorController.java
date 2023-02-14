@@ -1,4 +1,4 @@
-package ru.senya.conveyor.controllers;
+package ru.senya.conveyor.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,10 +14,9 @@ import ru.senya.conveyor.entity.dto.CreditDTO;
 import ru.senya.conveyor.entity.dto.LoanApplicationRequestDTO;
 import ru.senya.conveyor.entity.dto.LoanOfferDTO;
 import ru.senya.conveyor.entity.dto.ScoringDataDTO;
-import ru.senya.conveyor.services.ConveyorService;
+import ru.senya.conveyor.service.ConveyorService;
 
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,14 +28,14 @@ public class ConveyorController {
 
     @PostMapping("/offers")
     @Operation(summary = "Прескоринг - 4 кредитных предложения - на основании LoanApplicationRequestDTO")
-    public ResponseEntity<?> getLoanOffers(@RequestBody LoanApplicationRequestDTO loanApplicationRequestDTO) {
+    public ResponseEntity<Object> getLoanOffers(@RequestBody LoanApplicationRequestDTO loanApplicationRequestDTO) {
         List<LoanOfferDTO> offerDTOList = conveyorService.getOfferDTOList(loanApplicationRequestDTO);
         return new ResponseEntity<>(offerDTOList, HttpStatus.OK);
     }
 
     @PostMapping("/calculation")
     @Operation(summary = "Скоринг данных, высчитывание ставки(rate), полной стоимости кредита(psk), размера ежемесячного платежа(monthlyPayment), графика ежемесячных платежей")
-    public ResponseEntity<?> getCreditDto(@RequestBody ScoringDataDTO scoringDataDTO) {
+    public ResponseEntity<Object> getCreditDto(@RequestBody ScoringDataDTO scoringDataDTO) {
         CreditDTO creditDTO = conveyorService.getCreditDTO(scoringDataDTO);
         return new ResponseEntity<>(creditDTO, HttpStatus.OK);
     }

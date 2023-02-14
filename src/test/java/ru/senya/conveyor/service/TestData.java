@@ -1,4 +1,4 @@
-package ru.senya.conveyor.services;
+package ru.senya.conveyor.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

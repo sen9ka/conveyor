@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+springdoc:
+    swagger-ui:
+      path: /conveyor/swagger-ui.html
+    api-docs:
+      path: /conveyor/api-docs
+
+baseLoanRate: 10
+insuranceBonus: 0.3
+salaryClientBonus: 0.1
